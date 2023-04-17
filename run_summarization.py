@@ -94,7 +94,7 @@ def calc_running_avg_loss(loss, running_avg_loss, summary_writer, step, decay=0.
   else:
     running_avg_loss = running_avg_loss * decay + (1 - decay) * loss
   running_avg_loss = min(running_avg_loss, 12)  # clip
-  loss_sum = tf.Summary()
+  loss_sum = tf.compat.v1.Summary()
   tag_name = 'running_avg_loss/decay=%f' % (decay)
   loss_sum.value.add(tag=tag_name, simple_value=running_avg_loss)
   summary_writer.add_summary(loss_sum, step)
@@ -224,7 +224,7 @@ def run_eval(model, batcher, vocab):
   sess = tf.Session(config=util.get_config())
   eval_dir = os.path.join(FLAGS.log_root, "eval") # make a subdir of the root dir for eval data
   bestmodel_save_path = os.path.join(eval_dir, 'bestmodel') # this is where checkpoints of best models are saved
-  summary_writer = tf.summary.FileWriter(eval_dir)
+  summary_writer = tf.compat.v1.summary.FileWriter(eval_dir)
   running_avg_loss = 0 # the eval job keeps a smoother, running average loss to tell it when to implement early stopping
   best_loss = None  # will hold the best loss achieved so far
 

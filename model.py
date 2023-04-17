@@ -190,7 +190,7 @@ class SummarizationModel(object):
     train_dir = os.path.join(FLAGS.log_root, "train")
     vocab_metadata_path = os.path.join(train_dir, "vocab_metadata.tsv")
     self._vocab.write_metadata(vocab_metadata_path) # write metadata file
-    summary_writer = tf.summary.FileWriter(train_dir)
+    summary_writer = tf.compat.v1.summary.FileWriter(train_dir)
     config = projector.ProjectorConfig()
     embedding = config.embeddings.add()
     embedding.tensor_name = embedding_var.name
@@ -268,15 +268,15 @@ class SummarizationModel(object):
           else: # baseline model
             self._loss = tf.contrib.seq2seq.sequence_loss(tf.stack(vocab_scores, axis=1), self._target_batch, self._dec_padding_mask) # this applies softmax internally
 
-          tf.summary.scalar('loss', self._loss)
+          tf.compat.v1.summary.scalar('loss', self._loss)
 
           # Calculate coverage loss from the attention distributions
           if hps.coverage:
             with tf.compat.v1.variable_scope('coverage_loss'):
               self._coverage_loss = _coverage_loss(self.attn_dists, self._dec_padding_mask)
-              tf.summary.scalar('coverage_loss', self._coverage_loss)
+              tf.compat.v1.summary.scalar('coverage_loss', self._coverage_loss)
             self._total_loss = self._loss + hps.cov_loss_wt * self._coverage_loss
-            tf.summary.scalar('total_loss', self._total_loss)
+            tf.compat.v1.summary.scalar('total_loss', self._total_loss)
 
     if hps.mode == "decode":
       # We run decode beam search mode one decoder step at a time
