@@ -162,7 +162,7 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
 
       # Calculate p_gen
       if pointer_gen:
-        with tf.variable_scope('calculate_pgen'):
+        with tf.compat.v1.variable_scope('calculate_pgen'):
           p_gen = linear([context_vector, state.c, state.h, x], 1, True) # a scalar
           p_gen = tf.sigmoid(p_gen)
           p_gens.append(p_gen)
@@ -215,14 +215,14 @@ def linear(args, output_size, bias, bias_start=0.0, scope=None):
       total_arg_size += shape[1]
 
   # Now the computation.
-  with tf.variable_scope(scope or "Linear"):
-    matrix = tf.get_variable("Matrix", [total_arg_size, output_size])
+  with tf.compat.v1.variable_scope(scope or "Linear"):
+    matrix = tf.compat.v1.get_variable("Matrix", [total_arg_size, output_size])
     if len(args) == 1:
       res = tf.matmul(args[0], matrix)
     else:
       res = tf.matmul(tf.concat(axis=1, values=args), matrix)
     if not bias:
       return res
-    bias_term = tf.get_variable(
+    bias_term = tf.compat.v1.get_variable(
         "Bias", [output_size], initializer=tf.constant_initializer(bias_start))
   return res + bias_term
