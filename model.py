@@ -27,6 +27,7 @@ FLAGS = tf.compat.v1.flags.FLAGS
 
 class SummarizationModel(object):
   """A class to represent a sequence-to-sequence model for text summarization. Supports both baseline mode, pointer-generator mode, and coverage"""
+  tf.compat.v1.disable_eager_execution()
 
   def __init__(self, hps, vocab):
     self._hps = hps
