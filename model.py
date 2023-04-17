@@ -91,7 +91,7 @@ class SummarizationModel(object):
     with tf.compat.v1.variable_scope('encoder'):
       cell_fw = tf.compat.v1.nn.rnn_cell.LSTMCell(self._hps.hidden_dim, initializer=self.rand_unif_init, state_is_tuple=True)
       cell_bw = tf.compat.v1.nn.rnn_cell.LSTMCell(self._hps.hidden_dim, initializer=self.rand_unif_init, state_is_tuple=True)
-      (encoder_outputs, (fw_st, bw_st)) = tf.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, encoder_inputs, dtype=tf.float32, sequence_length=seq_len, swap_memory=True)
+      (encoder_outputs, (fw_st, bw_st)) = tf.compat.v1.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, encoder_inputs, dtype=tf.float32, sequence_length=seq_len, swap_memory=True)
       encoder_outputs = tf.concat(axis=2, values=encoder_outputs) # concatenate the forwards and backwards states
     return encoder_outputs, fw_st, bw_st
 
@@ -235,7 +235,7 @@ class SummarizationModel(object):
         for i,output in enumerate(decoder_outputs):
           if i > 0:
             tf.compat.v1.get_variable_scope().reuse_variables()
-          vocab_scores.append(tf.nn.xw_plus_b(output, w, v)) # apply the linear layer
+          vocab_scores.append(tf.compat.v1.nn.xw_plus_b(output, w, v)) # apply the linear layer
 
         vocab_dists = [tf.nn.softmax(s) for s in vocab_scores] # The vocabulary distributions. List length max_dec_steps of (batch_size, vsize) arrays. The words are in the order they appear in the vocabulary file.
 
@@ -302,7 +302,7 @@ class SummarizationModel(object):
     tf.compat.v1.summary.scalar('global_norm', global_norm)
 
     # Apply adagrad optimizer
-    optimizer = tf.train.AdagradOptimizer(self._hps.lr, initial_accumulator_value=self._hps.adagrad_init_acc)
+    optimizer = tf.compat.v1.train.AdagradOptimizer(self._hps.lr, initial_accumulator_value=self._hps.adagrad_init_acc)
     with tf.device("/gpu:0"):
       self._train_op = optimizer.apply_gradients(zip(grads, tvars), global_step=self.global_step, name='train_step')
 
