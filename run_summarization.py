@@ -303,7 +303,7 @@ def main(unused_argv):
   # Create a batcher object that will create minibatches of data
   batcher = Batcher(FLAGS.data_path, vocab, hps, single_pass=FLAGS.single_pass)
 
-  tf.set_random_seed(111) # a seed value for randomness
+  tf.compat.v1.set_random_seed(111) # a seed value for randomness
 
   if hps.mode == 'train':
     print("creating model...")
