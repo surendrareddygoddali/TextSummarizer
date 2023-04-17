@@ -21,9 +21,9 @@ import time
 import numpy as np
 import tensorflow as tf
 from attention_decoder import attention_decoder
-from tensorflow.contrib.tensorboard.plugins import projector
+from tensorboard.plugins import projector
 
-FLAGS = tf.app.flags.FLAGS
+FLAGS = tf.compat.v1.flags.FLAGS
 
 class SummarizationModel(object):
   """A class to represent a sequence-to-sequence model for text summarization. Supports both baseline mode, pointer-generator mode, and coverage"""
@@ -307,7 +307,7 @@ class SummarizationModel(object):
 
   def build_graph(self):
     """Add the placeholders, model, global step, train_op and summaries to the graph"""
-    tf.logging.info('Building graph...')
+    tf.compat.v1.logging.info('Building graph...')
     t0 = time.time()
     self._add_placeholders()
     with tf.device("/gpu:0"):
@@ -317,7 +317,7 @@ class SummarizationModel(object):
       self._add_train_op()
     self._summaries = tf.summary.merge_all()
     t1 = time.time()
-    tf.logging.info('Time to build graph: %i seconds', t1 - t0)
+    tf.compat.v1.logging.info('Time to build graph: %i seconds', t1 - t0)
 
   def run_train_step(self, sess, batch):
     """Runs one training iteration. Returns a dictionary containing train op, summaries, loss, global_step and (optionally) coverage loss."""
