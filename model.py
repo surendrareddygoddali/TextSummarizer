@@ -205,7 +205,7 @@ class SummarizationModel(object):
     with tf.compat.v1.variable_scope('seq2seq'):
       # Some initializers
       self.rand_unif_init = tf.random_uniform_initializer(-hps.rand_unif_init_mag, hps.rand_unif_init_mag, seed=123)
-      self.trunc_norm_init = tf.truncated_normal_initializer(stddev=hps.trunc_norm_init_std)
+      self.trunc_norm_init = tf.compat.v1.truncated_normal_initializer(stddev=hps.trunc_norm_init_std)
 
       # Add embedding matrix (shared by the encoder and decoder inputs)
       with tf.compat.v1.variable_scope('embedding'):
@@ -259,7 +259,7 @@ class SummarizationModel(object):
               targets = self._target_batch[:,dec_step] # The indices of the target words. shape (batch_size)
               indices = tf.stack( (batch_nums, targets), axis=1) # shape (batch_size, 2)
               gold_probs = tf.gather_nd(dist, indices) # shape (batch_size). prob of correct words on this step
-              losses = -tf.log(gold_probs)
+              losses = -tf.compat.v1.log(gold_probs)
               loss_per_step.append(losses)
 
             # Apply dec_padding_mask and get loss
@@ -283,14 +283,14 @@ class SummarizationModel(object):
       assert len(final_dists)==1 # final_dists is a singleton list containing shape (batch_size, extended_vsize)
       final_dists = final_dists[0]
       topk_probs, self._topk_ids = tf.nn.top_k(final_dists, hps.batch_size*2) # take the k largest probs. note batch_size=beam_size in decode mode
-      self._topk_log_probs = tf.log(topk_probs)
+      self._topk_log_probs = tf.compat.v1.log(topk_probs)
 
 
   def _add_train_op(self):
     """Sets self._train_op, the op to run for training."""
     # Take gradients of the trainable variables w.r.t. the loss function to minimize
     loss_to_minimize = self._total_loss if self._hps.coverage else self._loss
-    tvars = tf.trainable_variables()
+    tvars = tf.compat.v1.trainable_variables()
     gradients = tf.gradients(loss_to_minimize, tvars, aggregation_method=tf.AggregationMethod.EXPERIMENTAL_TREE)
 
     # Clip the gradients
