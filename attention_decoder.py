@@ -145,7 +145,7 @@ def attention_decoder(decoder_inputs, initial_state, encoder_states, enc_padding
 
       # Merge input and previous attentions into one vector x of the same size as inp
       input_size = inp.get_shape().with_rank(2)[1]
-      if input_size.value is None:
+      if input_size is None: #.value
         raise ValueError("Could not infer input size from input: %s" % inp.name)
       x = linear([inp] + [context_vector], input_size, True)
 
