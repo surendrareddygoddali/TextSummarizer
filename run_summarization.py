@@ -107,12 +107,12 @@ def restore_best_model():
   tf.compat.v1.logging.info("Restoring bestmodel for training...")
 
   # Initialize all vars in the model
-  sess = tf.Session(config=util.get_config())
+  sess = tf.compat.v1.Session(config=util.get_config())
   print("Initializing all variables...")
-  sess.run(tf.initialize_all_variables())
+  sess.run(tf.compat.v1.initialize_all_variables())
 
   # Restore the best model from eval dir
-  saver = tf.train.Saver([v for v in tf.all_variables() if "Adagrad" not in v.name])
+  saver = tf.compat.v1.train.Saver([v for v in tf.compat.v1.all_variables() if "Adagrad" not in v.name])
   print("Restoring all non-adagrad variables from best model in eval dir...")
   curr_ckpt = util.load_ckpt(saver, sess, "eval")
   print ("Restored %s." % curr_ckpt)
@@ -121,7 +121,7 @@ def restore_best_model():
   new_model_name = curr_ckpt.split("/")[-1].replace("bestmodel", "model")
   new_fname = os.path.join(FLAGS.log_root, "train", new_model_name)
   print ("Saving model to %s..." % (new_fname))
-  new_saver = tf.train.Saver() # this saver saves all variables that now exist, including Adagrad variables
+  new_saver = tf.compat.v1.train.Saver() # this saver saves all variables that now exist, including Adagrad variables
   new_saver.save(sess, new_fname)
   print ("Saved.")
   exit()
@@ -132,12 +132,12 @@ def convert_to_coverage_model():
   tf.compat.v1.logging.info("converting non-coverage model to coverage model..")
 
   # initialize an entire coverage model from scratch
-  sess = tf.Session(config=util.get_config())
+  sess = tf.compat.v1.Session(config=util.get_config())
   print("initializing everything...")
-  sess.run(tf.global_variables_initializer())
+  sess.run(tf.compat.v1.global_variables_initializer())
 
   # load all non-coverage weights from checkpoint
-  saver = tf.train.Saver([v for v in tf.global_variables() if "coverage" not in v.name and "Adagrad" not in v.name])
+  saver = tf.train.Saver([v for v in tf.compat.v1.global_variables() if "coverage" not in v.name and "Adagrad" not in v.name])
   print("restoring non-coverage variables...")
   curr_ckpt = util.load_ckpt(saver, sess)
   print("restored.")
@@ -145,7 +145,7 @@ def convert_to_coverage_model():
   # save this model and quit
   new_fname = curr_ckpt + '_cov_init'
   print("saving model to %s..." % (new_fname))
-  new_saver = tf.train.Saver() # this one will save all variables that now exist
+  new_saver = tf.compat.v1.train.Saver() # this one will save all variables that now exist
   new_saver.save(sess, new_fname)
   print("saved.")
   exit()
@@ -162,9 +162,9 @@ def setup_training(model, batcher):
     convert_to_coverage_model()
   if FLAGS.restore_best_model:
     restore_best_model()
-  saver = tf.train.Saver(max_to_keep=3) # keep 3 checkpoints at a time
+  saver = tf.compat.v1.train.Saver(max_to_keep=3) # keep 3 checkpoints at a time
 
-  sv = tf.train.Supervisor(logdir=train_dir,
+  sv = tf.compat.v1.train.Supervisor(logdir=train_dir,
                      is_chief=True,
                      saver=saver,
                      summary_op=None,
@@ -220,8 +220,8 @@ def run_training(model, batcher, sess_context_manager, sv, summary_writer):
 def run_eval(model, batcher, vocab):
   """Repeatedly runs eval iterations, logging to screen and writing summaries. Saves the model with the best loss seen so far."""
   model.build_graph() # build the graph
-  saver = tf.train.Saver(max_to_keep=3) # we will keep 3 best checkpoints at a time
-  sess = tf.Session(config=util.get_config())
+  saver = tf.compat.v1.train.Saver(max_to_keep=3) # we will keep 3 best checkpoints at a time
+  sess = tf.compat.v1.Session(config=util.get_config())
   eval_dir = os.path.join(FLAGS.log_root, "eval") # make a subdir of the root dir for eval data
   bestmodel_save_path = os.path.join(eval_dir, 'bestmodel') # this is where checkpoints of best models are saved
   summary_writer = tf.compat.v1.summary.FileWriter(eval_dir)
