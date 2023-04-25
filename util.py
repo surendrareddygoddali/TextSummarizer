@@ -23,7 +23,7 @@ FLAGS = tf.compat.v1.flags.FLAGS
 
 def get_config():
   """Returns config for tf.session"""
-  config = tf.ConfigProto(allow_soft_placement=True)
+  config = tf.compat.v1.ConfigProto(allow_soft_placement=True)
   config.gpu_options.allow_growth=True
   return config
 
